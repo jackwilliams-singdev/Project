@@ -17,6 +17,8 @@ if __name__ == "__main__":
     
     RUN_EXTRACTION = config.get("RUN_AUDIO_EXTRACTION", True)
     RUN_TRANSCRIPTION = config.get("RUN_TRANSCRIPTION", True)
+    RUN_STATE_ANALYSIS = config.get("RUN_STATE_ANALYSIS", False)
+
     AUDIO_MODE = config.get("AUDIO_MODE", "raw")
     
     INPUT_VIDEO = Path(config["INPUT_VIDEO"])
@@ -48,9 +50,9 @@ if __name__ == "__main__":
             transcript_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_transcript.txt"
             transcribe_audio(final_wav, transcript_file)
         else:
-            print(f"⚠️ Cannot transcribe: Audio file not found at {final_wav}")
+            print(f"Cannot transcribe: Audio file not found at {final_wav}")
 
-    if config.get("RUN_STATE_ANALYSIS", False):
+    if RUN_STATE_ANALYSIS:
         if final_wav and final_wav.exists():
             # We need the transcript to exist to analyze it
             transcript_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_transcript.txt"
@@ -58,6 +60,6 @@ if __name__ == "__main__":
                 state_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_state_analysis.txt"
                 analyze_machine_state(transcript_file, state_file)
             else:
-                print("⚠️ Cannot analyze state: Transcript file not found.")
+                print("Cannot analyze state: Transcript file not found.")
     
     print("--- Pipeline Complete! ---")

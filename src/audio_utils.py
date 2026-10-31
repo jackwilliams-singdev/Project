@@ -25,5 +25,5 @@ def extract_audio(mov: Path, wav_dir: Path, mode: str) -> Path:
     cmd.append(str(wav))
     subprocess.run(cmd, check=True)
     
-    print(f"✔ Extracted Audio ({mode}): {wav.name}")
+    print(f"Extracted Audio ({mode}): {wav.name}")
     return wav

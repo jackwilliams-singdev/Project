@@ -22,4 +22,4 @@ def transcribe_audio(audio_path: Path, text_path: Path):
 
     full_text = "\n".join(lines)
     text_path.write_text(full_text, encoding="utf-8")
-    print(f"✔ Saved Transcription: {text_path.name}")
+    print(f"Saved Transcription: {text_path.name}")
