@@ -1,0 +1,9 @@
+RUN_AUDIO_EXTRACTION: true
+RUN_TRANSCRIPTION: true
+RUN_STATE_ANALYSIS: true
+
+AUDIO_MODE: "filtered"  # raw or filtered
+
+INPUT_VIDEO: 'C:\Users\JackWilliams\OneDrive - Indicium Dynamics\Desktop\Project\Videos\Videos\IMG_5046.mov'
+OUTPUT_DIR: 'C:\Users\JackWilliams\OneDrive - Indicium Dynamics\Desktop\Project\Audio\enhanced'
+WAV_DIR: 'C:\Users\JackWilliams\OneDrive - Indicium Dynamics\Desktop\Project\Audio\intermediate'

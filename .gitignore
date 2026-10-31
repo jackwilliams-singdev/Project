@@ -4,3 +4,8 @@ Videos/
 
 .vscode/
 
+Audio/
+
+src/__pycache__/
+
+  

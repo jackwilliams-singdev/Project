@@ -1,9 +1,0 @@
-RUN_AUDIO_EXTRACTION: true
-RUN_TRANSCRIPTION: true
-RUN_STATE_ANALYSIS: true
-
-AUDIO_MODE: "filtered"  # raw or filtered
-
-INPUT_VIDEO: "/home/jackwilliams/Desktop/Site Vids/Videos/IMG_5056.mov"
-OUTPUT_DIR: "/home/jackwilliams/Desktop/Site Vids/Audio/enhanced"
-WAV_DIR: "/home/jackwilliams/Desktop/Site Vids/Audio/intermediate"
