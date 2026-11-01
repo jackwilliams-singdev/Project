@@ -1,3 +1,4 @@
+import os
 import yaml
 import shutil
 from pathlib import Path
@@ -7,13 +8,25 @@ from audio_utils import extract_audio
 from transcribe import transcribe_audio
 from analyzer import analyze_machine_state
 
-def load_config(config_path="config.yaml"):
+def load_config(config_path="configs/config.yaml"):
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
+    
+def load_secrets(secrets_path="configs/secrets.yaml"):
+    p = Path(secrets_path)
+    if not p.exists():
+        print(f"Warning: {secrets_path} not found; using existing environment variables.")
+        return {}
+    with open(p, "r") as f:
+        return yaml.safe_load(f) or {}
 
 if __name__ == "__main__":
     # 1. Load Settings
     config = load_config()
+    secrets = load_secrets()
+
+    for key, value in secrets.items():
+        os.environ.setdefault(key, str(value))
     
     RUN_EXTRACTION = config.get("RUN_AUDIO_EXTRACTION", True)
     RUN_TRANSCRIPTION = config.get("RUN_TRANSCRIPTION", True)

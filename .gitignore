@@ -3,3 +3,4 @@ Media/
 __pycache__/
 *.py[cod]
 .venv/
+configs/secrets.yaml
