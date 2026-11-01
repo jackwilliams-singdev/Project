@@ -8,6 +8,8 @@ from audio_utils import extract_audio
 from transcribe import transcribe_audio
 from analyzer import analyze_machine_state
 
+PROJECT_ROOT = Path(__file__).resolve().parent
+
 def load_config(config_path="configs/config.yaml"):
     with open(config_path, "r") as f:
         return yaml.safe_load(f)
@@ -19,6 +21,9 @@ def load_secrets(secrets_path="configs/secrets.yaml"):
         return {}
     with open(p, "r") as f:
         return yaml.safe_load(f) or {}
+    
+def load_prompt(prompt_path: str) -> str:
+    return Path(prompt_path).read_text(encoding="utf-8")
 
 if __name__ == "__main__":
     # 1. Load Settings
@@ -71,10 +76,11 @@ if __name__ == "__main__":
             transcript_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_transcript.txt"
             if transcript_file.exists():
                 state_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_state_analysis.txt"
+                prompt_template = load_prompt(PROJECT_ROOT / config["PROMPT_FILE"])
                 analyze_machine_state(
                     transcript_file,
                     state_file,
-                    config["PROMPT"],
+                    prompt_template,
                 )
             else:
                 print("Cannot analyze state: Transcript file not found.")
