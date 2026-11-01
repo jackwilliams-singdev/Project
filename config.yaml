@@ -7,3 +7,15 @@ AUDIO_MODE: "filtered"  # (raw, filtered)
 INPUT_VIDEO: "Media/Videos/IMG_5097.mov"
 OUTPUT_DIR: "Media/Audio/enhanced"
 WAV_DIR: "Media/Audio/intermediate"
+
+PROMPT: |
+  You are an expert engineer analyzing the operation of a hydrocyclone.
+  Below is a timestamped transcript from a video where a person is describing the machine.
+
+  Your task:
+  1. Read the transcript and the timestamps.
+  2. Identify the state of the hydrocyclone (e.g., Roping, Cutting, Fanning, Flaring, Transition, Blockage).
+  3. Return a structured summary of what state the machine is in at different timestamps.
+
+  Transcript:
+  {{TRANSCRIPT}}

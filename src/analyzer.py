@@ -1,15 +1,16 @@
 import os
 from pathlib import Path
 from google import genai
-from google.genai import types
 
-def analyze_machine_state(transcript_path: Path, output_path: Path):
+def analyze_machine_state(
+    transcript_path: Path,
+    output_path: Path,
+    prompt_template: str,
+):
     print(f"Sending transcript to Gemini for state analysis...")
     
     # 1. Read the transcript text
     transcript_text = transcript_path.read_text(encoding="utf-8")
-    prompt_template_path = Path(__file__).resolve().parent.parent / "prompt.txt"
-    prompt_template = prompt_template_path.read_text(encoding="utf-8")
     
     # 2. Initialize the Gemini client (it automatically picks up GEMINI_API_KEY)
     client = genai.Client()

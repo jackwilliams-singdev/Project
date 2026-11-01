@@ -58,7 +58,11 @@ if __name__ == "__main__":
             transcript_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_transcript.txt"
             if transcript_file.exists():
                 state_file = OUTPUT_DIR / f"{INPUT_VIDEO.stem}_state_analysis.txt"
-                analyze_machine_state(transcript_file, state_file)
+                analyze_machine_state(
+                    transcript_file,
+                    state_file,
+                    config["PROMPT"],
+                )
             else:
                 print("Cannot analyze state: Transcript file not found.")
     
