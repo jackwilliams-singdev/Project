@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from google import genai
 
@@ -27,4 +26,4 @@ def analyze_machine_state(
     
     # 5. Save the result
     output_path.write_text(response.text, encoding="utf-8")
-    print(f"✔ Saved State Analysis: {output_path.name}")
+    print(f"Saved State Analysis: {output_path.name}")
