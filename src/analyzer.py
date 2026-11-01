@@ -8,29 +8,19 @@ def analyze_machine_state(transcript_path: Path, output_path: Path):
     
     # 1. Read the transcript text
     transcript_text = transcript_path.read_text(encoding="utf-8")
+    prompt_template_path = Path(__file__).resolve().parent.parent / "prompt.txt"
+    prompt_template = prompt_template_path.read_text(encoding="utf-8")
     
     # 2. Initialize the Gemini client (it automatically picks up GEMINI_API_KEY)
     client = genai.Client()
     
-    # 3. Construct the prompt
-    # We tell Gemini exactly what to look for and how to format the output.
-    prompt = f"""
-    You are an expert engineer analyzing the operation of a hydrocyclone.
-    Below is a timestamped transcript from a video where a person is describing the machine.
-    
-    Your task:
-    1. Read the transcript and the timestamps.
-    2. Identify the state of the hydrocyclone (e.g., Roping, Cutting, Fanning, Flaring, Transition, Blockage).
-    3. Return a structured summary of what state the machine is in at different timestamps.
-    
-    Transcript:
-    {transcript_text}
-    """
+    # 3. Insert the transcript into the prompt template.
+    prompt = prompt_template.replace("{{TRANSCRIPT}}", transcript_text)
     
     # 4. Call the API
-    # Using a fast, cost-effective model like 3.8 Flash
+    # Use a fast, cost-effective model.
     response = client.models.generate_content(
-        model="gemini-3.8-flash",
+        model="gemini-3.5-flash-lite",
         contents=prompt,
     )
     
