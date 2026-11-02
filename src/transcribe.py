@@ -5,15 +5,15 @@ from faster_whisper.utils import download_model
 # Base directory where all models will be stored
 MODEL_BASE_DIR = Path("/media/jackwilliams/external_01_cyclone_data/models")
 
-# ==========================================
-# 1. WHISPER IMPLEMENTATION
-# ==========================================
+# Whipser Implementation
 def get_whisper_model(model_name: str):
+    
     model_dir = MODEL_BASE_DIR / model_name
     if not (model_dir / "model.bin").exists():
         print(f"Downloading Whisper model '{model_name}' (first run only)...")
         model_dir.mkdir(parents=True, exist_ok=True)
         download_model(model_name, output_dir=str(model_dir))
+    
     return WhisperModel(str(model_dir), device="cpu", compute_type="int8")
 
 def transcribe_with_whisper(audio_path: Path, text_path: Path, model_name: str):
@@ -40,13 +40,11 @@ def transcribe_with_whisper(audio_path: Path, text_path: Path, model_name: str):
     print(f"Saved Transcription: {text_path.name}")
 
 
-# ==========================================
-# 2. PARAKEET IMPLEMENTATION
-# ==========================================
+# Parakeet Implementation
 def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str):
     print(f"Transcribing {audio_path.name} using Parakeet ({model_name})...")
     
-    # Lazy import: NeMo takes a long time to load, so we only import it if we actually need it
+    # NeMo takes a long time to load, so we only import it if we actually need it
     import nemo.collections.asr as nemo_asr
 
     # NeMo will automatically download the model to its cache directory on first run
@@ -57,7 +55,7 @@ def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str)
 
     result = hypotheses[0]
     
-    # Format timestamps to match your Whisper output style
+    # Format timestamps
     lines = []
     if hasattr(result, 'timestamp') and 'segment' in result.timestamp:
         for seg in result.timestamp['segment']:
@@ -69,13 +67,9 @@ def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str)
     print(f"Saved Transcription (Parakeet): {text_path.name}")
 
 
-# ==========================================
-# 3. ROUTER FUNCTION
-# ==========================================
+# Function to route to desired model
 def transcribe_audio(audio_path: Path, text_path: Path, engine: str, model_name: str):
-    """
-    Routes to the correct transcription engine based on config.
-    """
+
     if engine.lower() == "whisper":
         transcribe_with_whisper(audio_path, text_path, model_name)
     elif engine.lower() == "parakeet":
