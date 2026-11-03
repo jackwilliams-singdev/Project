@@ -27,4 +27,4 @@ if __name__ == "__main__":
         outputs_dir=OUTPUTS_DIR, 
         config=config
     )
-    print("--- Pipeline Complete! ---")
+    print("Pipeline Complete!")

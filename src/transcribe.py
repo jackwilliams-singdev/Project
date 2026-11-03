@@ -1,14 +1,16 @@
 from pathlib import Path
+from typing import Optional
+
 from faster_whisper import WhisperModel
 from faster_whisper.utils import download_model
+from platformdirs import user_cache_path
 
-# Base directory where all models will be stored
-MODEL_BASE_DIR = Path("/media/jackwilliams/external_01_cyclone_data/models")
+MODEL_BASE_DIR = user_cache_path("Project", appauthor=False) / "whisper"
 
 # Whipser Implementation
-def get_whisper_model(model_name: str):
+def get_whisper_model(model_name: str, model_base_dir: Optional[Path] = None):
     
-    model_dir = MODEL_BASE_DIR / model_name
+    model_dir = (model_base_dir or MODEL_BASE_DIR) / model_name
     if not (model_dir / "model.bin").exists():
         print(f"Downloading Whisper model '{model_name}' (first run only)...")
         model_dir.mkdir(parents=True, exist_ok=True)
@@ -16,10 +18,15 @@ def get_whisper_model(model_name: str):
     
     return WhisperModel(str(model_dir), device="cpu", compute_type="int8")
 
-def transcribe_with_whisper(audio_path: Path, text_path: Path, model_name: str):
+def transcribe_with_whisper(
+    audio_path: Path,
+    text_path: Path,
+    model_name: str,
+    model_base_dir: Optional[Path] = None,
+):
     print(f"Transcribing {audio_path.name} using Whisper ({model_name})...")
     
-    model = get_whisper_model(model_name)
+    model = get_whisper_model(model_name, model_base_dir)
 
     segments, info = model.transcribe(
         str(audio_path),
@@ -68,10 +75,16 @@ def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str)
 
 
 # Function to route to desired model
-def transcribe_audio(audio_path: Path, text_path: Path, engine: str, model_name: str):
+def transcribe_audio(
+    audio_path: Path,
+    text_path: Path,
+    engine: str,
+    model_name: str,
+    model_base_dir: Optional[Path] = None,
+):
 
     if engine.lower() == "whisper":
-        transcribe_with_whisper(audio_path, text_path, model_name)
+        transcribe_with_whisper(audio_path, text_path, model_name, model_base_dir)
     elif engine.lower() == "parakeet":
         transcribe_with_parakeet(audio_path, text_path, model_name)
     else:

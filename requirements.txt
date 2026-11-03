@@ -37,6 +37,7 @@ nh3==0.3.7
 numpy==2.5.4
 onnxruntime==1.31.1
 packaging==26.3
+platformdirs==4.14.3
 progress==1.6.1
 protobuf==7.36.2
 pyasn1==0.6.5

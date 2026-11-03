@@ -3,12 +3,29 @@ RUN_TRANSCRIPTION:    # true, false
 RUN_STATE_ANALYSIS:   # true, false
 RUN_DENOISE:          # true, false
 
-TRANSCRIPTION_ENGINE: "parakeet"  # "whisper", "parakeet"
-WHISPER_MODEL: "distil-large-v3"
-PARAKEET_MODEL: "nvidia/parakeet-tdt-0.6b-v3"
+# Transcription settings
+TRANSCRIPTION_ENGINE: # "whisper", "parakeet"
+WHISPER_MODEL: # "model-name"
+WHISPER_MODEL_DIR: # "model-cache"  
+PARAKEET_MODEL: # "model-name"
 
-AUDIO_MODE: "filtered"  # "raw", "filtered"
+# Analysis settings
+GEMINI_MODEL: # "model-name"
 
+# Filter settings
+AUDIO_MODE: # "raw", "filtered"
+AUDIO_SAMPLE_RATE: # 48000, 16000, etc.
+AUDIO_CHANNEL: # "left", "right", or "mix"
+HIGHPASS_FREQUENCY: # Hz; used in filtered mode
+LOUDNESS_TARGET_I: # LUFS; used in filtered mode
+LOUDNESS_TARGET_TP: # dB true peak; used in filtered mode
+LOUDNESS_TARGET_LRA: # LU; used in filtered mode
+
+# noise-reduce settings
+DENOISE_STATIONARY: # true, false
+DENOISE_PROP_DECREASE: # 0.0 (none) to 1.0 (maximum)
+
+# Directory paths
 INPUT_VIDEO: # "video-path"
 OUTPUTS_DIR: # "output-path"
 PROMPT_FILE: "configs/prompt.txt"

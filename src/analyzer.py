@@ -5,8 +5,9 @@ def analyze_machine_state(
     transcript_path: Path,
     output_path: Path,
     prompt_template: str,
+    model_name: str = "gemini-3.5-flash-lite",
 ):
-    print(f"Sending transcript to Gemini")
+    print(f"Sending transcript to {model_name}")
     
     # Read transcript text
     transcript_text = transcript_path.read_text(encoding="utf-8")
@@ -19,7 +20,7 @@ def analyze_machine_state(
     
     # Call the API
     response = client.models.generate_content(
-        model="gemini-3.5-flash-lite",
+        model=model_name,
         contents=prompt,
     )
     output_path.write_text(response.text, encoding="utf-8")
