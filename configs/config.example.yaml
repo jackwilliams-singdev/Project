@@ -1,0 +1,14 @@
+RUN_AUDIO_EXTRACTION: # true, false
+RUN_TRANSCRIPTION:    # true, false
+RUN_STATE_ANALYSIS:   # true, false
+RUN_DENOISE:          # true, false
+
+TRANSCRIPTION_ENGINE: "parakeet"  # "whisper", "parakeet"
+WHISPER_MODEL: "distil-large-v3"
+PARAKEET_MODEL: "nvidia/parakeet-tdt-0.6b-v3"
+
+AUDIO_MODE: "filtered"  # "raw", "filtered"
+
+INPUT_VIDEO: # "video-path"
+OUTPUTS_DIR: # "output-path"
+PROMPT_FILE: "configs/prompt.txt"
