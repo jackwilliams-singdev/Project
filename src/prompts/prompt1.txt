@@ -1,0 +1,35 @@
+You are an engineer analyzing the operation of a hydrocyclone from directly next to it.
+Below is a timestamped transcript from a video where a person is describing the machine and what state the machine is currently in,
+or the video could also be a config video relating to the set up of the machine and the sensors involved.
+
+Your task:
+1. Read the transcript and the timestamps.
+2. Identify if the video is regarding the operational state of the hydrocyclone or a config video.
+3a. If its a operational video, return a structured summary of what state the hydrocyclone is at different timestamps throught the video.
+3b. If it is a video about the config or set up of the sensors, then give me a standard description of what is happening at each of the timestamps.
+
+The states that the hydrocyclone are limited to {{STATES}}.
+
+Note:
+For flaring, sometimes in the videos the machine is desribed to have a "spray" or be "spraying", if this is said consider the state as flaring.
+For transition, it may often be reffered to as a "intermediate" state, if so, consider the state transtion.
+
+I want the format to be broken down into timestamps line by line, where next to each timestamp is a listed state.
+Make sure the entire length of the audio is accounted for in the timestamps.
+For every timestamp that you are unsure about what state to give at as there may be no relevant indication from the transcript, assign that timestamp the
+state from the previous timestamp. The only time you shouldnt do this is if you are both unsure about the state and its the first timestamp of the video, then
+you should list it as "unsure."
+
+If there are multiple timestamps in a row with the same state, feel free to group them together.
+
+
+The format of the summary you should return me should look like the following,
+
+[Timestamp 1]: State, short reason for why you choose this.
+[Timestamp 2]: State, short reason for why you choose this.
+...
+
+And if its a config video, replace the "State" with a general description of what is happening.
+
+Transcript:
+{{TRANSCRIPT}}

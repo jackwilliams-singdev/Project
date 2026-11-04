@@ -47,31 +47,50 @@ def transcribe_with_whisper(
     print(f"Saved Transcription: {text_path.name}")
 
 
-# Parakeet Implementation
+import onnx_asr
+
 def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str):
-    print(f"Transcribing {audio_path.name} using Parakeet ({model_name})...")
-    
-    # NeMo takes a long time to load, so we only import it if we actually need it
-    import nemo.collections.asr as nemo_asr
+    print(f"Transcribing {audio_path.name} using Parakeet ONNX ({model_name})...")
 
-    # NeMo will automatically download the model to its cache directory on first run
-    asr_model = nemo_asr.models.ASRModel.from_pretrained(model_name)
+    model = onnx_asr.load_model(model_name).with_timestamps()
+    result = model.recognize(str(audio_path))
 
-    # NeMo expects a list of file paths
-    hypotheses = asr_model.transcribe([str(audio_path)], timestamps=True)
-
-    result = hypotheses[0]
-    
-    # Format timestamps
     lines = []
-    if hasattr(result, 'timestamp') and 'segment' in result.timestamp:
-        for seg in result.timestamp['segment']:
-            lines.append(f"[{seg['start']:.2f}s -> {seg['end']:.2f}s] {seg['segment']}")
-    else:
-        lines.append(result.text)
+    current_tokens = []
+    segment_start = None
+    last_end = None
+
+    for i, token in enumerate(result.tokens):
+        start = result.timestamps[i]
+        end = result.timestamps[i + 1] if i + 1 < len(result.timestamps) else start
+
+        # Detect long silence (> 1.5s) → force segment break
+        silence_gap = start - last_end if last_end is not None else 0
+
+        if segment_start is None:
+            segment_start = start
+
+        current_tokens.append(token)
+        last_end = end
+
+        # Break conditions: sentence-ending punctuation or long silence
+        is_sentence_end = token.strip() in {".", "?", "!"}
+        if is_sentence_end or silence_gap > 1.5:
+            text = "".join(current_tokens).strip()
+            if text:
+                lines.append(f"[{segment_start:.2f}s -> {end:.2f}s] {text}")
+            current_tokens = []
+            segment_start = None
+            last_end = None
+
+    # Flush remaining tokens
+    if current_tokens:
+        text = "".join(current_tokens).strip()
+        if text:
+            lines.append(f"[{segment_start:.2f}s -> {last_end:.2f}s] {text}")
 
     text_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Saved Transcription (Parakeet): {text_path.name}")
+    print(f"Saved Transcription (Parakeet ONNX): {text_path.name}")
 
 
 # Function to route to desired model

@@ -1,0 +1,33 @@
+RUN_AUDIO_EXTRACTION: false
+RUN_TRANSCRIPTION: false
+RUN_STATE_ANALYSIS: true
+RUN_DENOISE: true
+
+# Transcription settings
+TRANSCRIPTION_ENGINE: "parakeet"
+WHISPER_MODEL: "model-name"
+WHISPER_MODEL_DIR: "/media/jackwilliams/external_01_cyclone_data/models"  
+PARAKEET_MODEL: "nemo-parakeet-tdt-0.6b-v3"
+
+# Analysis settings
+GEMINI_MODEL: "gemini-3.5-flash-lite"
+
+# Filter settings
+AUDIO_MODE: "filtered"
+AUDIO_SAMPLE_RATE: 48000
+AUDIO_CHANNEL: "right"
+HIGHPASS_FREQUENCY: 100
+LOUDNESS_TARGET_I: -16
+LOUDNESS_TARGET_TP: -1.5
+LOUDNESS_TARGET_LRA: 11
+
+# noise-reduce settings
+DENOISE_STATIONARY: true 
+DENOISE_PROP_DECREASE: 0.8
+
+# Directory paths
+INPUT_VIDEO: "/media/jackwilliams/external_01_cyclone_data/Videos/IMG_5079.mov"
+OUTPUTS_DIR: "Media/Output"
+PROMPT_NAME: "prompt1.txt"
+
+MACHINE_STATES: "Roping, Flaring, Transition, Blocked"

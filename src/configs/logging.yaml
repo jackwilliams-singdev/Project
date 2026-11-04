@@ -1,0 +1,13 @@
+logging:
+    level: INFO
+    enable_stderr: true
+    enable_stdout: false
+    enable_file: false
+    enable_slack: false
+    format: "%(asctime)s %(name)s | %(message)s"
+
+module_logging_levels:
+    huggingface_hub: ERROR
+    urllib3: ERROR
+    nemo: WARNING
+    onnxruntime: WARNING

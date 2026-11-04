@@ -4,6 +4,6 @@ Videos/
 __pycache__/
 *.py[cod]
 .venv
-configs/secrets.yaml
-configs/config.yaml
+src/configs/secrets.yaml
+requirements-lock.txt
 

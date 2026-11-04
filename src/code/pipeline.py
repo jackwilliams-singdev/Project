@@ -1,9 +1,11 @@
 from pathlib import Path
 
-from audio_utils import extract_audio, reduce_noise
-from transcribe import transcribe_audio
-from analyzer import analyze_machine_state
-from utils import load_prompt, PROJECT_ROOT
+from code.audio_utils import extract_audio, reduce_noise
+from code.transcribe import transcribe_audio
+from code.analyzer import analyze_machine_state
+from utils import load_prompt
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
     
@@ -31,6 +33,8 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
             whisper_model_dir = PROJECT_ROOT / whisper_model_dir
     parakeet_model = config.get("PARAKEET_MODEL", "nvidia/parakeet-tdt-0.6b-v3")
     gemini_model = config.get("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    prompt_name = config.get("PROMPT_NAME") 
+    machine_states = config.get("MACHINE_STATES", "Roping, Flaring, Transition, Blocked")
 
     # Setup directories internally
     mode_dir = outputs_dir / audio_mode
@@ -95,12 +99,13 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
             transcript_file = transcript_dir / f"{input_video.stem}_transcript.txt"
             if transcript_file.exists():
                 state_file = analysis_dir / f"{input_video.stem}_state_analysis.txt"
-                prompt_template = load_prompt(PROJECT_ROOT / config["PROMPT_FILE"])
+                prompt_template = load_prompt(prompt_name) 
                 analyze_machine_state(
                     transcript_file,
                     state_file,
                     prompt_template,
                     model_name=gemini_model,
+                    machine_states=machine_states,
                 )
             else:
                 print("Cannot analyze state: Transcript file not found.")

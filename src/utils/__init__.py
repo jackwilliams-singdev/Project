@@ -1,12 +1,9 @@
 import yaml
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+SRC_ROOT = Path(__file__).resolve().parent.parent
+PROMPTS_DIR = SRC_ROOT / "prompts"
 
-def load_config(config_path="configs/config.yaml"):
-    with open(config_path, "r") as f:
-        return yaml.safe_load(f)
-    
 def load_secrets(secrets_path="configs/secrets.yaml"):
     p = Path(secrets_path)
     if not p.exists():
@@ -15,8 +12,12 @@ def load_secrets(secrets_path="configs/secrets.yaml"):
     with open(p, "r") as f:
         return yaml.safe_load(f) or {}
     
-def load_prompt(prompt_path: str) -> str:
-    return Path(prompt_path).read_text(encoding="utf-8")
+def load_prompt(prompt_name: str) -> str:
+
+    prompt_path = PROMPTS_DIR / prompt_name
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_path}")
+    return prompt_path.read_text(encoding="utf-8")
 
 def setup_directories(outputs_dir: Path, mode: str, run_analysis: bool):
     mode_dir = outputs_dir / mode

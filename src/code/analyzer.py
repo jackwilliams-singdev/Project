@@ -6,6 +6,7 @@ def analyze_machine_state(
     output_path: Path,
     prompt_template: str,
     model_name: str = "gemini-3.5-flash-lite",
+    machine_states: str = "Roping, Flaring, Transition, Blocked",
 ):
     print(f"Sending transcript to {model_name}")
     
@@ -17,6 +18,7 @@ def analyze_machine_state(
     
     # Insert the transcript into the prompt template.
     prompt = prompt_template.replace("{{TRANSCRIPT}}", transcript_text)
+    prompt = prompt.replace("{{STATES}}", machine_states)
     
     # Call the API
     response = client.models.generate_content(
