@@ -1,5 +1,5 @@
-RUN_AUDIO_EXTRACTION: false
-RUN_TRANSCRIPTION: false
+RUN_AUDIO_EXTRACTION: true 
+RUN_TRANSCRIPTION: true
 RUN_STATE_ANALYSIS: true
 RUN_DENOISE: true
 
@@ -27,7 +27,7 @@ DENOISE_PROP_DECREASE: 0.8
 
 # Directory paths
 INPUT_VIDEO: "/media/jackwilliams/external_01_cyclone_data/Videos/IMG_5079.mov"
-OUTPUTS_DIR: "Media/Output"
+OUTPUTS_DIR: "/media/jackwilliams/external_01_cyclone_data/sing-data"
 PROMPT_NAME: "prompt1.txt"
 
 MACHINE_STATES: "Roping, Flaring, Transition, Blocked"

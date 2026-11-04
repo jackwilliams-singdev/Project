@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 from code.audio_utils import extract_audio, reduce_noise
 from code.transcribe import transcribe_audio
@@ -36,11 +37,17 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
     prompt_name = config.get("PROMPT_NAME") 
     machine_states = config.get("MACHINE_STATES", "Roping, Flaring, Transition, Blocked")
 
-    # Setup directories internally
-    mode_dir = outputs_dir / audio_mode
-    audio_dir = mode_dir / "audio"
-    transcript_dir = mode_dir / "transcript"
-    analysis_dir = mode_dir / "analysis"
+    # 1. Generate timestamp ONCE for the whole run
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    # 2. Determine TRUE audio mode
+    # If denoise is on, the final file is no longer "raw"
+    final_audio_mode = "filtered" if (audio_mode == "filtered" or run_denoise) else "raw"
+
+    # 3. Setup symmetric directories
+    audio_dir = outputs_dir / "audio" / final_audio_mode
+    transcript_dir = outputs_dir / "transcript" / final_audio_mode
+    analysis_dir = outputs_dir / "analysis" / final_audio_mode
 
     audio_dir.mkdir(parents=True, exist_ok=True)
     transcript_dir.mkdir(parents=True, exist_ok=True)
@@ -48,6 +55,7 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
         analysis_dir.mkdir(parents=True, exist_ok=True)
 
     final_wav = None
+    actual_transcript_file = None
 
     # Run Audio Extraction
     if run_extraction:
@@ -55,6 +63,7 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
             input_video,
             audio_dir,
             mode=audio_mode,
+            timestamp=timestamp,
             sample_rate=audio_sample_rate,
             channel=audio_channel,
             highpass_frequency=highpass_frequency,
@@ -63,12 +72,13 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
             loudness_target_lra=loudness_target_lra,
         )
     else:
-        suffix = "_filtered" if audio_mode == "filtered" else "_raw"
-        final_wav = audio_dir / f"{input_video.stem}{suffix}.wav"
+        # If not extracting, assume the file follows the new naming convention
+        final_wav = audio_dir / f"{input_video.stem}_{audio_mode}_{timestamp}.wav"
 
     # Run Denoising
     if run_denoise and final_wav and final_wav.exists():
-        denoised_wav = audio_dir / f"{input_video.stem}_denoised.wav"
+        # If it was raw, it's now being denoised, so it becomes filtered
+        denoised_wav = audio_dir / f"{input_video.stem}_{final_audio_mode}_{timestamp}_denoised.wav"
         final_wav = reduce_noise(
             final_wav,
             denoised_wav,
@@ -80,12 +90,13 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
     # Run Transcription
     if run_transcription:
         if final_wav and final_wav.exists():
-            transcript_file = transcript_dir / f"{input_video.stem}_transcript.txt"
+            actual_transcript_file = transcript_dir / f"{input_video.stem}_transcript_{timestamp}.txt"
+            
             active_model = whisper_model if transcription_engine == "whisper" else parakeet_model
             
             transcribe_audio(
                 audio_path=final_wav, 
-                text_path=transcript_file, 
+                text_path=actual_transcript_file, 
                 engine=transcription_engine, 
                 model_name=active_model,
                 model_base_dir=whisper_model_dir,
@@ -96,13 +107,15 @@ def run_pipeline(input_video: Path, outputs_dir: Path, config: dict):
     # Run State Analysis
     if run_state_analysis:
         if final_wav and final_wav.exists():
-            transcript_file = transcript_dir / f"{input_video.stem}_transcript.txt"
-            if transcript_file.exists():
-                state_file = analysis_dir / f"{input_video.stem}_state_analysis.txt"
+            if actual_transcript_file and actual_transcript_file.exists():
+                # Name the file with the timestamp
+                state_file = analysis_dir / f"{input_video.stem}_state_analysis_{timestamp}.txt"
+                
                 prompt_template = load_prompt(prompt_name) 
+                
                 analyze_machine_state(
-                    transcript_file,
-                    state_file,
+                    actual_transcript_file,  # The full path to the timestamped transcript
+                    state_file,              # The full path to the timestamped analysis file
                     prompt_template,
                     model_name=gemini_model,
                     machine_states=machine_states,

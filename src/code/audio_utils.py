@@ -6,13 +6,11 @@ import noisereduce as nr
 import librosa
 import soundfile as sf
 
-"""
-A function to extract and filter the audio.
-"""
 def extract_audio(
     mov: Path,
     wav_dir: Path,
     mode: str,
+    timestamp: str,
     sample_rate: int = 48000,
     channel: str = "left",
     highpass_frequency: int = 100,
@@ -21,12 +19,12 @@ def extract_audio(
     loudness_target_lra: int = 11,
 ) -> Path:
     
-    # Extracts either raw or filtered audio
     wav_dir.mkdir(parents=True, exist_ok=True)
     
     apply_filters = (mode == "filtered")
-    suffix = "_filtered" if apply_filters else "_raw"
-    wav = wav_dir / f"{mov.stem}{suffix}.wav"
+    
+    # New naming: IMG_5046_filtered_20261104_154512.wav
+    wav = wav_dir / f"{mov.stem}_{mode}_{timestamp}.wav"
     
     channel_filters = {
         "left": "pan=mono|c0=c0",
@@ -40,7 +38,6 @@ def extract_audio(
     cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
            "-i", str(mov), "-vn", "-ar", str(sample_rate), "-c:a", "pcm_s16le"]
     
-    # Audio filters
     if apply_filters:
         filter_chain = (
             f"{pan_filter},"
@@ -48,6 +45,13 @@ def extract_audio(
             f"loudnorm=I={loudness_target_i}:TP={loudness_target_tp}:LRA={loudness_target_lra}"
         )
         cmd.extend(["-af", filter_chain])
+        
+        # Print filter settings (only for filtered mode)
+        print(f"--- Audio Filter Settings ---")
+        print(f"  Channel:   {channel}")
+        print(f"  Highpass:  {highpass_frequency} Hz")
+        print(f"  Loudnorm:  I={loudness_target_i}, TP={loudness_target_tp}, LRA={loudness_target_lra}")
+        print(f"-----------------------------")
     else:
         cmd.extend(["-af", pan_filter])
         
@@ -57,9 +61,6 @@ def extract_audio(
     print(f"Extracted Audio ({mode}): {wav.name}")
     return wav
 
-"""
-Applied noise reduction tool to hopefully mitigate slurry noise.
-"""
 def reduce_noise(
     input_wav: Path,
     output_wav: Path,
@@ -67,13 +68,16 @@ def reduce_noise(
     stationary: bool = True,
     sample_rate: int = 48000,
 ) -> Path:
-    """Applies noisereduce to an audio file."""
     print(f"Applying noisereduce to {input_wav.name}")
     
-    # Load audio
+    # Print denoise settings
+    print(f"--- Denoise Settings ---")
+    print(f"  Stationary:    {stationary}")
+    print(f"  Prop Decrease: {prop_decrease}")
+    print(f"------------------------")
+    
     data, sr = librosa.load(str(input_wav), sr=sample_rate, mono=True)
     
-    # Run the noise reduction
     reduced = nr.reduce_noise(
         y=data, 
         sr=sr,
@@ -81,7 +85,6 @@ def reduce_noise(
         prop_decrease=prop_decrease
     )
     
-    # Save the cleaned audio
     sf.write(str(output_wav), reduced, sr)
     print(f"Saved denoised audio: {output_wav.name}")
     return output_wav

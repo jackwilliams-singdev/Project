@@ -1,11 +1,26 @@
 from pathlib import Path
 from typing import Optional
+from datetime import datetime
 
 from faster_whisper import WhisperModel
 from faster_whisper.utils import download_model
 from platformdirs import user_cache_path
 
 MODEL_BASE_DIR = user_cache_path("Project", appauthor=False) / "whisper"
+
+def save_transcript_with_metadata(text_path: Path, lines: list, audio_path: Path, model_name: str):
+    
+    metadata = (
+        "\n\n"
+        f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+        f"Model used:   {model_name}\n"
+        f"Audio file:   {audio_path.name}\n"
+    )
+    
+    full_text = "\n".join(lines) + metadata
+    text_path.write_text(full_text, encoding="utf-8")
+
+    return text_path
 
 # Whipser Implementation
 def get_whisper_model(model_name: str, model_base_dir: Optional[Path] = None):
@@ -43,8 +58,8 @@ def transcribe_with_whisper(
     for segment in segments:
         lines.append(f"[{segment.start:.2f}s -> {segment.end:.2f}s] {segment.text.strip()}")
 
-    text_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Saved Transcription: {text_path.name}")
+    actual_path = save_transcript_with_metadata(text_path, lines, audio_path, f"Whisper ({model_name})")
+    print(f"Saved Transcription: {actual_path.name}")
 
 
 import onnx_asr
@@ -89,8 +104,8 @@ def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str)
         if text:
             lines.append(f"[{segment_start:.2f}s -> {last_end:.2f}s] {text}")
 
-    text_path.write_text("\n".join(lines), encoding="utf-8")
-    print(f"Saved Transcription (Parakeet ONNX): {text_path.name}")
+    actual_path = save_transcript_with_metadata(text_path, lines, audio_path, f"Parakeet ONNX ({model_name})")
+    print(f"Saved Transcription (Parakeet ONNX): {actual_path.name}")
 
 
 # Function to route to desired model
