@@ -1,9 +1,9 @@
-Media/
-Videos/
 .vscode/
 __pycache__/
 *.py[cod]
 .venv
-src/configs/secrets.yaml
-requirements-lock.txt
 
+src/configs/secrets.yaml
+
+requirements-lock.txt
+notes.txt
