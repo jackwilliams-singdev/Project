@@ -5,8 +5,6 @@ noisereduce
 numpy
 onnx-asr[cpu,hub]
 onnxruntime<1.24
-faster-whisper
-platformdirs
 google-genai
 PyYAML
 deep-chainmap

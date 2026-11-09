@@ -1,71 +1,13 @@
 from pathlib import Path
-from typing import Optional
-from datetime import datetime
-
-from faster_whisper import WhisperModel
-from faster_whisper.utils import download_model
-from platformdirs import user_cache_path
-
-MODEL_BASE_DIR = user_cache_path("Project", appauthor=False) / "whisper"
-
-def save_transcript_with_metadata(text_path: Path, lines: list, audio_path: Path, model_name: str):
-    
-    metadata = (
-        "\n\n"
-        f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
-        f"Model used:   {model_name}\n"
-        f"Audio file:   {audio_path.name}\n"
-    )
-    
-    full_text = "\n".join(lines) + metadata
-    text_path.write_text(full_text, encoding="utf-8")
-
-    return text_path
-
-# Whipser Implementation
-def get_whisper_model(model_name: str, model_base_dir: Optional[Path] = None):
-    
-    model_dir = (model_base_dir or MODEL_BASE_DIR) / model_name
-    if not (model_dir / "model.bin").exists():
-        print(f"Downloading Whisper model '{model_name}' (first run only)...")
-        model_dir.mkdir(parents=True, exist_ok=True)
-        download_model(model_name, output_dir=str(model_dir))
-    
-    return WhisperModel(str(model_dir), device="cpu", compute_type="int8")
-
-def transcribe_with_whisper(
-    audio_path: Path,
-    text_path: Path,
-    model_name: str,
-    model_base_dir: Optional[Path] = None,
-):
-    print(f"Transcribing {audio_path.name} using Whisper ({model_name})...")
-    
-    model = get_whisper_model(model_name, model_base_dir)
-
-    segments, info = model.transcribe(
-        str(audio_path),
-        beam_size=5,
-        language="en",
-        vad_filter=False,
-        vad_parameters=dict(min_silence_duration_ms=500),
-        condition_on_previous_text=False,
-        word_timestamps=True,
-        hotwords="roping, flaring, transition",
-    )
-
-    lines = []
-    for segment in segments:
-        lines.append(f"[{segment.start:.2f}s -> {segment.end:.2f}s] {segment.text.strip()}")
-
-    actual_path = save_transcript_with_metadata(text_path, lines, audio_path, f"Whisper ({model_name})")
-    print(f"Saved Transcription: {actual_path.name}")
-
+from utils import append_run_metadata
 
 import onnx_asr
 
+def save_transcript(text_path: Path, lines: list):
+    text_path.write_text("\n".join(lines), encoding="utf-8")
+
 def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str):
-    print(f"Transcribing {audio_path.name} using Parakeet ONNX ({model_name})...")
+    print(f"Transcribing Audio using Parakeet ONNX ({model_name})")
 
     model = onnx_asr.load_model(model_name).with_timestamps()
     result = model.recognize(str(audio_path))
@@ -104,8 +46,16 @@ def transcribe_with_parakeet(audio_path: Path, text_path: Path, model_name: str)
         if text:
             lines.append(f"[{segment_start:.2f}s -> {last_end:.2f}s] {text}")
 
-    actual_path = save_transcript_with_metadata(text_path, lines, audio_path, f"Parakeet ONNX ({model_name})")
-    print(f"Saved Transcription (Parakeet ONNX): {actual_path.name}")
+    save_transcript(text_path, lines)
+    
+    # Save metadata to the shared file
+    append_run_metadata(text_path.parent, "Transcription", {
+        "Engine": "Parakeet ONNX",
+        "Model": model_name,
+        "Audio_File": audio_path.name,
+        "Transcript_File": text_path.name
+    })
+    print(f"Saved Transcription (Parakeet ONNX): {text_path.name}\n")
 
 
 # Function to route to desired model
@@ -114,12 +64,9 @@ def transcribe_audio(
     text_path: Path,
     engine: str,
     model_name: str,
-    model_base_dir: Optional[Path] = None,
 ):
 
-    if engine.lower() == "whisper":
-        transcribe_with_whisper(audio_path, text_path, model_name, model_base_dir)
-    elif engine.lower() == "parakeet":
+    if engine.lower() == "parakeet":
         transcribe_with_parakeet(audio_path, text_path, model_name)
     else:
         raise ValueError(f"Unknown transcription engine: {engine}. Use 'whisper' or 'parakeet'.")

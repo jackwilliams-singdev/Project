@@ -4,6 +4,7 @@ __pycache__/
 .venv
 
 src/configs/secrets.yaml
+src/configs/config.yaml
 
 requirements-lock.txt
 notes.txt

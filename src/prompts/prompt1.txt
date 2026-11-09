@@ -12,7 +12,9 @@ The states that the hydrocyclone are limited to {{STATES}}.
 
 Note:
 For flaring, sometimes in the videos the machine is desribed to have a "spray" or be "spraying", if this is said consider the state as flaring.
-For transition, it may often be reffered to as a "intermediate" state, if so, consider the state transtion.
+For transition, it may often be reffered to as a "intermediate" state, if so, consider the state "transtion".
+If someone ever says "Is this okay?", or "Is this alright now?", or something along those similar lines. Then consider that state as "Flaring".
+If you are tossing up to call something Roping or Choking based on a transcript, default to choking if its in the transcript.
 
 I want the format to be broken down into timestamps line by line, where next to each timestamp is a listed state.
 Make sure the entire length of the audio is accounted for in the timestamps.
@@ -29,7 +31,27 @@ The format of the summary you should return me should look like the following,
 [Timestamp 2]: State, short reason for why you choose this.
 ...
 
-And if its a config video, replace the "State" with a general description of what is happening.
+The above format should be the only thing in the response you give.
+
+And if its a config video, replace the "State" with a description of what is happening.
+The sensor identification names are in the format of 
+
+ID: Letter-Letter-Number (0-9)-Number (0-9).
+    eg. AE04
+
+Sometimes the operator will list out the name of a port on the machine in the format of,
+
+Port: Number (1-9), Letter
+    eg. 1A
+
+If a port is listed, list it next to its corresponding sensor, as a sensor cable plugs into a port.
+
+Make sure every single sensor in the transcript is listed, and none are left out.
+
+If the transcript lists a bunch of sensors, it is either a tap test or a config video.
+    - To tell if its a tap test, then the transcript might mention "tapping" or "firm/firmness"
+        - If you think its a tap test, then assume every time a new sensor is mentioned, the operator is tapping on it with a tool.
+    - If its config, it might not mention those things.
 
 Transcript:
 {{TRANSCRIPT}}

@@ -12,13 +12,11 @@ def main(conf):
     
     if api_key:
         os.environ["GEMINI_API_KEY"] = str(api_key)
-        print("Successfully loaded key from config.")
     else:
         print("Warning: Key not found in config or secrets.")
 
     input_video_str = get_conf_key(conf, "INPUT_VIDEO")
     outputs_dir_str = get_conf_key(conf, "OUTPUTS_DIR")
-    audio_mode = get_conf_key(conf, "AUDIO_MODE", required=False, default="raw")
 
     INPUT_VIDEO = Path(input_video_str)
     OUTPUTS_DIR = Path(outputs_dir_str)
@@ -27,14 +25,14 @@ def main(conf):
         print(f"File not found: {INPUT_VIDEO}")
         exit(1)
 
-    print(f"Starting Pipeline for {INPUT_VIDEO.name} (mode: {audio_mode})")
+    print()
+    print(f"Starting Pipeline for {INPUT_VIDEO.name}")
 
     run_pipeline(
         input_video=INPUT_VIDEO, 
         outputs_dir=OUTPUTS_DIR, 
         config=conf
     )
-    print("Pipeline Complete!")
 
 if __name__ == "__main__":
     # Parse both config and secrets into a single dictionary
