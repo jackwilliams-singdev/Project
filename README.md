@@ -53,78 +53,36 @@ Create a file called config.yaml in the configs folder.
 Here is the template you should use for the config yaml file.
 
 ```bash
-# TRANSCRIPTION SETTINGS
-# =====================================================================
-# Valid Inputs: "parakeet" (Whisper has been removed)
-TRANSCRIPTION_ENGINE: "parakeet"
-
-# Valid Inputs: Any valid HuggingFace ONNX model repository.
-# Default: "nemo-parakeet-tdt-0.6b-v3"
-PARAKEET_MODEL: "nemo-parakeet-tdt-0.6b-v3"
-
-# ANALYSIS SETTINGS
-# =====================================================================
-# Valid Inputs: Any valid Gemini model string (e.g., "gemini-1.5-pro", "gemini-3.5-flash-lite")
-GEMINI_MODEL: "gemini-3.5-flash-lite"
-
-# Valid Inputs: The name of a .txt file located inside the `src/prompts/` directory.
-PROMPT_NAME: "prompt1.txt"
-
-# Valid Inputs: A comma-separated string of the machine states you want the AI to look for.
-MACHINE_STATES: "Roping, Flaring, Transition, Blocked"
-
-# AUDIO FILTERING SETTINGS (Applied via FFmpeg)
-# =====================================================================
-# Valid Inputs: "raw" or "filtered"
-# "filtered" = Applies Highpass and Loudnorm filters.
-# "raw" = Skips FFmpeg filters entirely.
-AUDIO_MODE: "filtered"
-
-# Valid Inputs: true or false
-# true = Applies noise reduction (noisereduce library).
-# false = Skips noise reduction.
-RUN_DENOISE: true
-
-# Valid Inputs: Any positive integer (e.g., 16000, 44100, 48000).
-# Practical: 48000 (video standard) or 16000 (speech standard).
-AUDIO_SAMPLE_RATE: 48000
-
-# Valid Inputs: "left", "right", or "mix" (case-sensitive string).
-AUDIO_CHANNEL: "right"
-
-# Valid Range: 1 to 20000 (Hz). 
-# Practical Range: 80 to 200 Hz (removes low-frequency rumble).
-HIGHPASS_FREQUENCY: 100
-
-# Valid Range: -70.0 to -5.0 (LUFS). 
-# Practical Range: -16 (podcast standard) to -14 (streaming standard).
-LOUDNESS_TARGET_I: -16
-
-# Valid Range: -9.0 to 0.0 (dBTP). 
-# Practical Range: -1.0 to -2.0 (prevents audio clipping).
-LOUDNESS_TARGET_TP: -1.5
-
-# Valid Range: 1.0 to 50.0 (LU).
-# Practical Range: 7 to 11 (keeps spoken word volume consistent).
-LOUDNESS_TARGET_LRA: 11
-
-# NOISE REDUCTION SETTINGS (Applied via noisereduce)
-# =====================================================================
-# Valid Inputs: true or false
-# true = Assumes constant background noise (e.g., a fan).
-# false = Adapts to changing background noise (e.g., traffic).
-DENOISE_STATIONARY: true
-
-# Valid Range: 0.0 to 1.0 (Float).
-# 0.0 = no noise reduction. 1.0 = maximum reduction (may cause robotic artifacts).
-DENOISE_PROP_DECREASE: 0.8
-
-# DIRECTORY PATHS
-# =====================================================================
-# Valid Inputs: Absolute paths to your video file and output directory.
-# MUST be absolute paths (e.g., "/home/user/videos/input.mov").
+# **Directory Paths**
 INPUT_VIDEO: "/absolute/path/to/your/video.mov"
 OUTPUTS_DIR: "/absolute/path/to/your/output/folder"
+# Valid Inputs: Absolute paths to your video file and output directory.
+# MUST be absolute paths (e.g., "/home/user/videos/input.mov").
+
+# **Pipeline Settings:**
+AUDIO_MODE: "filtered"                                 # Valid Inputs: "raw", "filtered"
+RUN_DENOISE: true                                      # Valid Inputs: true or false
+
+# **Audio Filtering Settings (Applied via FFmpeg)**
+AUDIO_SAMPLE_RATE: 48000                               # Valid Inputs: Any positive integer (e.g., 16000, 44100, 48000).
+AUDIO_CHANNEL: "right"                                 # Valid Inputs: "left", "right", or "mix"
+HIGHPASS_FREQUENCY: 100                                # Valid Range: 1 to 20000 (Hz). 
+LOUDNESS_TARGET_I: -16                                 # Valid Range: -70.0 to -5.0 (LUFS). 
+LOUDNESS_TARGET_TP: -1.5                               # Valid Range: -9.0 to 0.0 (dBTP). 
+LOUDNESS_TARGET_LRA: 11                                # Valid Range: 1.0 to 50.0 (LU).
+
+# **Noise Reduction Settings (Applied via noisereduce)**
+DENOISE_STATIONARY: true                               # Valid Inputs: true or false
+DENOISE_PROP_DECREASE: 0.8                             # Valid Range: 0.0 to 1.0 (Float).
+
+# **Transcription Settings.**
+TRANSCRIPTION_ENGINE: "parakeet"                       # Valid Inputs: "parakeet" (More to come, only have parakeet implementation right now)
+PARAKEET_MODEL: "nemo-parakeet-tdt-0.6b-v3"
+
+# **Analysis settings**
+GEMINI_MODEL: "gemini-3.5-flash-lite"                  # Valid Inputs: Any valid Gemini model string (e.g., "gemini-1.5-pro", "gemini-3.5-flash-lite")
+PROMPT_NAME: "prompt1.txt"                             # Valid Inputs: The name of a .txt file located inside the `src/prompts/` directory.
+MACHINE_STATES: "Roping, Flaring, Transition, Blocked" # Valid Inputs: A comma-separated string of the machine states you want the AI to look for.
 ```
 
 Next create a secrets.yaml file to store your Gemini API Key.
