@@ -23,7 +23,7 @@ Install the required dependencies:
 pip install -r requirements.txt
 ```
 
-## 3. Environment Setup
+## 2. Environment Setup
 
 Open your terminal and run the command for your OS:
 * **Linux:** `nano ~/.bashrc`
@@ -45,7 +45,7 @@ Then apply changes using
 ```bash
 source ~/.bashrc  # (or source ~/.zshrc on macOS)
 ```
-## 4. Configuration
+## 3. Configuration
 
 Before running the pipeline, you must provide it with your specific settings, paths, and your Gemini API key.
 
@@ -97,7 +97,7 @@ Then add your key and save.
 GEMINI_API_KEY: "your-api-key-goes-here"
 ```
 
-## 5. Running
+## 4. Running
 
 Use this command to run.
 
