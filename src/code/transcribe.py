@@ -65,7 +65,6 @@ def transcribe_audio(
     engine: str,
     model_name: str,
 ):
-
     if engine.lower() == "parakeet":
         transcribe_with_parakeet(audio_path, text_path, model_name)
     else:

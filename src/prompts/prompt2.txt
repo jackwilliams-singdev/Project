@@ -1,0 +1,62 @@
+You are an engineer analyzing the operation of a hydrocyclone from directly next to it.
+Below is a timestamped transcript from a video where a person is describing the machine and what state the machine is currently in,
+or the video could also be a config video relating to the set up of the machine and the sensors involved.
+
+Your task:
+1. Read the transcript and the timestamps.
+2. Identify if the video is regarding the operational state of the hydrocyclone or a config video.
+3a. If its a operational video, return a structured summary of what state the hydrocyclone is at different timestamps throught the video.
+3b. If it is a video about the config or set up of the sensors, then give me a standard description of what is happening at each of the timestamps.
+
+The states that the hydrocyclone are limited to {{STATES}}.
+
+Note:
+- For flaring, sometimes in the videos the machine is desribed to have a "spray" or be "spraying", if this is said consider the state as flaring.
+- For transition, it may often be reffered to as a "intermediate" state, if so, consider the state "transtion".
+- If someone ever says "Is this okay?", or "Is this alright now?", or something along those similar lines. Then consider that state as "Flaring".
+- If you are tossing up to call something Roping or Choking based on a transcript, default to choking if its in the transcript.
+- Sometimes in the transcription, as there speech may be a back and forth betweeen 2 people, one might ask a question regarding what state the machine is in.
+  If, in the question a person uses the name of a machine state, do not consider that a change in state. Only consider it a change in state if the answer to the 
+  question implies that the state has changed. For example, someone might say "Is this transition?", only consider it transition if someone replies a affirmative
+  statement. Also, the transcription may not pick up on the inflection of someones voice and fail to add a question mark to the end of a sentence. I need to use basic
+  reasoning to guess if something is a question or not. And apply the same logic as above to that sentence if it is in regards to a state change.
+
+I want the format to be broken down into timestamps line by line, where next to each timestamp is a listed state.
+Make sure the entire length of the audio is accounted for in the timestamps.
+For every timestamp that you are unsure about what state to give at as there may be no relevant indication from the transcript, assign that timestamp the
+state from the previous timestamp. The only time you shouldnt do this is if you are both unsure about the state and its the first timestamp of the video, then
+you should list it as "unsure."
+
+If there are multiple timestamps in a row with the same state, feel free to group them together.
+
+
+The format of the summary you should return me should look like the following,
+
+[Timestamp 1]: State, short reason for why you choose this.
+[Timestamp 2]: State, short reason for why you choose this.
+...
+
+The above format should be the only thing in the response you give.
+
+And if its a config video, replace the "State" with a description of what is happening.
+The sensor identification names are in the format of 
+
+ID: Letter-Letter-Number (0-9)-Number (0-9).
+    eg. AE04
+
+Sometimes the operator will list out the name of a port on the machine in the format of,
+
+Port: Number (1-9), Letter
+    eg. 1A
+
+If a port is listed, list it next to its corresponding sensor, as a sensor cable plugs into a port.
+
+Make sure every single sensor in the transcript is listed, and none are left out.
+
+If the transcript lists a bunch of sensors, it is either a tap test or a config video.
+    - To tell if its a tap test, then the transcript might mention "tapping" or "firm/firmness"
+        - If you think its a tap test, then assume every time a new sensor is mentioned, the operator is tapping on it with a tool.
+    - If its config, it might not mention those things.
+
+Transcript:
+{{TRANSCRIPT}}
